@@ -7,17 +7,20 @@ import {
   Param,
   Delete,
   ValidationPipe,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { forbidUnknownValues } from './util/forbidUnknownValues';
+import JwtAuthenticationGuard from 'src/authentication/guards/jwtAuthentication-guard';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
   @Post()
+  @UseGuards(JwtAuthenticationGuard)
   create(
     @Body(new ValidationPipe(forbidUnknownValues))
     createPostDto: CreatePostDto,
@@ -36,6 +39,7 @@ export class PostsController {
   }
 
   @Patch(':id')
+  @UseGuards(JwtAuthenticationGuard)
   update(
     @Param('id') id: string,
     @Body(new ValidationPipe(forbidUnknownValues)) updatePostDto: UpdatePostDto,
@@ -44,6 +48,7 @@ export class PostsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthenticationGuard)
   remove(@Param('id') id: string) {
     return this.postsService.remove(+id);
   }
