@@ -29,6 +29,7 @@ export class AuthenticationService {
       const { password, ...userData } = createdUser; // Remove password from the response
       return userData;
     } catch (error) {
+      // Error code for duplicate email in db
       if (error?.code === '23505') {
         throw new HttpException(
           'User with that email already exists',
@@ -76,6 +77,7 @@ export class AuthenticationService {
 
   public getCookieWithJwtToken(userId: number) {
     const payload: TokenPayload = { userId };
+    console.log(payload);
     const token = this.jwtService.sign(payload);
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
       'JWT_EXPIRATION_TIME',
