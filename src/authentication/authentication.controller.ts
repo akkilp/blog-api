@@ -7,6 +7,7 @@ import {
   UseGuards,
   Res,
   Get,
+  ValidationPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { AuthenticationService } from './authentication.service';
@@ -14,6 +15,7 @@ import RegisterDto from './dto/register.dto';
 import RequestWithUser from './interfaces/requestWithUser.interface';
 import { LocalAuthenticationGuard } from './guards/localAuthentication.guard';
 import JwtAuthenticationGuard from './guards/jwtAuthentication-guard';
+import { forbidUnknownValues } from 'src/posts/util/forbidUnknownValues';
 
 @Controller('authentication')
 export class AuthenticationController {
@@ -29,7 +31,10 @@ export class AuthenticationController {
   }
 
   @Post('register')
-  async register(@Body() registrationData: RegisterDto) {
+  async register(
+    @Body(new ValidationPipe(forbidUnknownValues))
+    registrationData: RegisterDto,
+  ) {
     return this.authenticationService.register(registrationData);
   }
 

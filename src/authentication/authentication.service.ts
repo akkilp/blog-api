@@ -14,7 +14,23 @@ export class AuthenticationService {
     private readonly configService: ConfigService,
   ) {}
 
+  private async checkAdminPassword(password: string) {
+    const adminPassword = await bcrypt.hash(
+      this.configService.get('ADMIN_PASSWORD'),
+      10,
+    );
+
+    const isValid = await bcrypt.compare(password, adminPassword);
+
+    if (!isValid) {
+      throw new HttpException('Invalid admin password', HttpStatus.FORBIDDEN);
+    }
+  }
+
   public async register(registrationData: RegisterDto) {
+    await this.checkAdminPassword(registrationData.adminPassword);
+    registrationData.adminPassword = undefined;
+
     // Make hash out of plain text
     const hashedPassword = await bcrypt.hash(registrationData.password, 10);
 
