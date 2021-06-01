@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { validateEnvVariables } from './util/envValidationSchema';
 import { DatabaseModule } from './database/database.module';
 import { AuthenticationModule } from './authentication/authentication.module';
+import { CategoryModule } from './categories/categories.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { AuthenticationModule } from './authentication/authentication.module';
     /*Import env variables through ConfigModule and validate variables with joi */
     ConfigModule.forRoot(validateEnvVariables),
     DatabaseModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [],
