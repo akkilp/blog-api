@@ -8,12 +8,16 @@ import {
   Delete,
   ValidationPipe,
   UseGuards,
+  Req,
+  ClassSerializerInterceptor,
+  UseInterceptors,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { forbidUnknownValues } from './util/forbidUnknownValues';
 import JwtAuthenticationGuard from 'src/authentication/guards/jwtAuthentication-guard';
+import RequestWithUser from 'src/authentication/interfaces/requestWithUser.interface';
 
 @Controller('posts')
 export class PostsController {
@@ -23,17 +27,20 @@ export class PostsController {
   @UseGuards(JwtAuthenticationGuard)
   create(
     @Body(new ValidationPipe(forbidUnknownValues))
-    createPostDto: CreatePostDto,
+    createPostData: CreatePostDto,
+    @Req() request: RequestWithUser,
   ) {
-    return this.postsService.create(createPostDto);
+    return this.postsService.create(createPostData, request);
   }
 
   @Get()
+  @UseInterceptors(ClassSerializerInterceptor)
   findAll() {
     return this.postsService.findAll();
   }
 
   @Get(':id')
+  @UseInterceptors(ClassSerializerInterceptor)
   findOne(@Param('id') id: string) {
     return this.postsService.findOne(+id);
   }
