@@ -50,23 +50,25 @@ export class PostsService {
   }
 
   async update(id: number, post: UpdatePostDto) {
-    const { categories, ...postData } = post;
-
-    // Update category data
-    if (categories.length > 0) {
-      await this.categoryService.updateCategories(categories);
+    const target = await this.postsRepository.findOne(id);
+    if (!target) {
+      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
     }
 
-    // Update post data
+    const { categories, ...postData } = post;
     await this.postsRepository.update(id, postData);
 
+    let categoryIds = [];
+    // Update category data
+    if (categories.length > 0) {
+      categoryIds = await this.categoryService.createCategories(categories);
+      await this.categoryService.updateCategories(categoryIds);
+    }
+    target.categories = categoryIds;
+    await this.postsRepository.save(target);
     const updatedPost = await this.postsRepository.findOne(id, {
       relations: ['author', 'categories'],
     });
-
-    if (!updatedPost) {
-      throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
-    }
 
     return updatedPost;
   }

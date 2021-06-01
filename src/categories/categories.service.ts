@@ -64,17 +64,17 @@ export class CategoryService {
     }
   }
 
-  async updateCategoryData(id: any) {
-    const categoryData = await this.getCategoryById(id);
+  async updateCategoryData(category) {
+    const categoryData = await this.getCategoryById(category);
     const hitAmount = categoryData['posts'] ? categoryData['posts'].length : 0;
     categoryData.numberOfPosts = hitAmount;
     await this.categoryRepository.save(categoryData);
   }
 
-  async updateCategories(idArr: any) {
+  async updateCategories(categories: any) {
     await Promise.all(
-      idArr.map(
-        async (categoryId) => await this.updateCategoryData(categoryId),
+      categories.map(
+        async (categories) => await this.updateCategoryData(categories),
       ),
     );
   }
