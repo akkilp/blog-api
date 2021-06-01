@@ -46,4 +46,36 @@ export class CategoryService {
     }
     throw new HttpException('Category does not exist', HttpStatus.NOT_FOUND);
   }
+
+  async getCategoryById(id: number) {
+    const category = await this.categoryRepository.findOne(id, {
+      relations: ['posts'],
+    });
+    if (category) {
+      return category;
+    }
+    throw new HttpException('Category does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async deleteCategory(id: number) {
+    const deleteResponse = await this.categoryRepository.delete(id);
+    if (!deleteResponse.affected) {
+      throw new HttpException('Category does not exist', HttpStatus.NOT_FOUND);
+    }
+  }
+
+  async updateCategoryData(id: any) {
+    const categoryData = await this.getCategoryById(id);
+    const hitAmount = categoryData['posts'] ? categoryData['posts'].length : 0;
+    categoryData.numberOfPosts = hitAmount;
+    await this.categoryRepository.save(categoryData);
+  }
+
+  async updateCategories(idArr: any) {
+    await Promise.all(
+      idArr.map(
+        async (categoryId) => await this.updateCategoryData(categoryId),
+      ),
+    );
+  }
 }

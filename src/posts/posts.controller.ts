@@ -25,6 +25,7 @@ export class PostsController {
 
   @Post()
   @UseGuards(JwtAuthenticationGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   create(
     @Body(new ValidationPipe(forbidUnknownValues))
     createPostData: CreatePostDto,
@@ -47,6 +48,7 @@ export class PostsController {
 
   @Patch(':id')
   @UseGuards(JwtAuthenticationGuard)
+  @UseInterceptors(ClassSerializerInterceptor)
   update(
     @Param('id') id: string,
     @Body(new ValidationPipe(forbidUnknownValues)) updatePostDto: UpdatePostDto,

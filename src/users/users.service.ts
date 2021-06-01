@@ -27,6 +27,7 @@ export class UsersService {
       HttpStatus.NOT_FOUND,
     );
   }
+
   async getById(id: number) {
     const user = await this.usersRepository.findOne(id);
     if (user) {

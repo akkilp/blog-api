@@ -20,6 +20,13 @@ export class Post {
   @Column()
   title: string;
 
+  @Column({
+    type: 'timestamptz',
+    nullable: true,
+    default: () => 'CURRENT_TIMESTAMP(7)',
+  })
+  created: Date;
+
   @ManyToOne(() => User, (author: User) => author.posts)
   public author: User;
 

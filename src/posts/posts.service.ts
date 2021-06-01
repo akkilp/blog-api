@@ -2,7 +2,6 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import RequestWithUser from 'src/authentication/interfaces/requestWithUser.interface';
 import { CategoryService } from 'src/categories/categories.service';
-import { CreateCategory } from 'src/categories/dto/category.dto';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -26,7 +25,7 @@ export class PostsService {
     }
 
     const postDataWithUser = {
-      user,
+      author: user,
       categories: categoryIds,
       ...postData,
     };
@@ -51,20 +50,52 @@ export class PostsService {
   }
 
   async update(id: number, post: UpdatePostDto) {
-    await this.postsRepository.update(id, post);
+    const { categories, ...postData } = post;
+
+    // Update category data
+    if (categories.length > 0) {
+      await this.categoryService.updateCategories(categories);
+    }
+
+    // Update post data
+    await this.postsRepository.update(id, postData);
+
     const updatedPost = await this.postsRepository.findOne(id, {
-      relations: ['author'],
+      relations: ['author', 'categories'],
     });
+
     if (!updatedPost) {
       throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
     }
+
     return updatedPost;
   }
 
   async remove(id: number) {
-    const deleteResponse = await this.postsRepository.delete(id);
+    // Find related categories
+    const relatedCategories = await this.postsRepository.findOne(id, {
+      relations: ['categories'],
+    });
+
+    // Map related categories into array of ids
+    const categoryArray = relatedCategories['categories'].map(
+      (category) => category.id,
+    );
+
+    // Delete posts
+    const deleteResponse = await this.postsRepository
+      .createQueryBuilder()
+      .delete()
+      .from(Post)
+      .where('id = :id', { id })
+      .execute();
+
     if (!deleteResponse.affected) {
       throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
     }
+
+    // Update data in categories based on array of ids
+    // This is used to track number of items in category
+    await this.categoryService.updateCategories(categoryArray);
   }
 }
