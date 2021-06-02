@@ -15,7 +15,7 @@ import RegisterDto from './dto/register.dto';
 import RequestWithUser from './interfaces/requestWithUser.interface';
 import { LocalAuthenticationGuard } from './guards/localAuthentication.guard';
 import JwtAuthenticationGuard from './guards/jwtAuthentication-guard';
-import { forbidUnknownValues } from 'src/posts/util/forbidUnknownValues';
+import { forbidUnknownValues } from '../posts/util/forbidUnknownValues';
 
 @Controller('authentication')
 export class AuthenticationController {

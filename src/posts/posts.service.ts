@@ -1,7 +1,7 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import RequestWithUser from 'src/authentication/interfaces/requestWithUser.interface';
-import { CategoryService } from 'src/categories/categories.service';
+import RequestWithUser from '../authentication/interfaces/requestWithUser.interface';
+import { CategoryService } from '../categories/categories.service';
 import { Repository } from 'typeorm';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -56,16 +56,16 @@ export class PostsService {
     }
 
     const { categories, ...postData } = post;
-    await this.postsRepository.update(id, postData);
 
     let categoryIds = [];
     // Update category data
     if (categories.length > 0) {
       categoryIds = await this.categoryService.createCategories(categories);
-      await this.categoryService.updateCategories(categoryIds);
     }
     target.categories = categoryIds;
     await this.postsRepository.save(target);
+    await this.postsRepository.update(id, postData);
+    await this.categoryService.updateCategories(categoryIds);
     const updatedPost = await this.postsRepository.findOne(id, {
       relations: ['author', 'categories'],
     });

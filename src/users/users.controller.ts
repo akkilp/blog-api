@@ -5,7 +5,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import JwtAuthenticationGuard from 'src/authentication/guards/jwtAuthentication-guard';
+import JwtAuthenticationGuard from '../authentication/guards/jwtAuthentication-guard';
 import { UsersService } from './users.service';
 
 @Controller('users')
@@ -16,6 +16,7 @@ export class UsersController {
   @UseInterceptors(ClassSerializerInterceptor)
   @Get()
   findAll() {
+    console.log('mitä helvettiä');
     return this.userService.getAllUsers();
   }
 }

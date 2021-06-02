@@ -16,8 +16,8 @@ import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { forbidUnknownValues } from './util/forbidUnknownValues';
-import JwtAuthenticationGuard from 'src/authentication/guards/jwtAuthentication-guard';
-import RequestWithUser from 'src/authentication/interfaces/requestWithUser.interface';
+import JwtAuthenticationGuard from '../authentication/guards/jwtAuthentication-guard';
+import RequestWithUser from '../authentication/interfaces/requestWithUser.interface';
 
 @Controller('posts')
 export class PostsController {
