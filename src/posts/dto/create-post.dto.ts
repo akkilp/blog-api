@@ -10,7 +10,7 @@ export class CreatePostDto {
   @IsString()
   title: string;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsArray()
   categories: CreateCategory[];
 }

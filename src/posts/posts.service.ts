@@ -15,23 +15,24 @@ export class PostsService {
     private readonly categoryService: CategoryService,
   ) {}
 
-  async create(post: CreatePostDto, { user }: RequestWithUser) {
-    const { categories, ...postData } = post;
+  async create(postData: CreatePostDto, { user }: RequestWithUser) {
+    const { categories, ...rest } = postData;
     let categoryIds = [];
-
-    /* Create categories if existing*/
-    if (categories) {
+    if (categories && categories?.length > 0) {
       categoryIds = await this.categoryService.createCategories(categories);
     }
 
     const postDataWithUser = {
       author: user,
+      ...rest,
       categories: categoryIds,
-      ...postData,
     };
 
-    const newPost = await this.postsRepository.create(postDataWithUser);
-    await this.postsRepository.save(newPost);
+    const newPost = await this.postsRepository.save(postDataWithUser);
+    if (categoryIds.length > 0) {
+      await this.categoryService.updateCategoryData(categoryIds);
+    }
+    newPost.author.password = undefined;
     return newPost;
   }
 
@@ -49,40 +50,32 @@ export class PostsService {
     return targetPost;
   }
 
-  async update(id: number, post: UpdatePostDto) {
-    const target = await this.postsRepository.findOne(id);
-    if (!target) {
+  async update(id: number, postData: UpdatePostDto) {
+    const isFound = await this.postsRepository.findOne(id);
+    if (!isFound) {
       throw new HttpException('Post not found', HttpStatus.NOT_FOUND);
     }
 
-    const { categories, ...postData } = post;
+    const { categories, ...rest } = postData;
+    const categoryIds =
+      categories?.length > 0
+        ? await this.categoryService.createCategories(categories)
+        : [];
 
-    let categoryIds = [];
-    // Update category data
-    if (categories.length > 0) {
-      categoryIds = await this.categoryService.createCategories(categories);
-    }
-    target.categories = categoryIds;
-    await this.postsRepository.save(target);
-    await this.postsRepository.update(id, postData);
-    await this.categoryService.updateCategories(categoryIds);
-    const updatedPost = await this.postsRepository.findOne(id, {
-      relations: ['author', 'categories'],
+    const updated = await this.postsRepository.save({
+      id,
+      ...rest,
+      categories: categoryIds,
     });
 
-    return updatedPost;
+    await this.categoryService.updateCategoryData(categoryIds);
+
+    return updated;
   }
 
   async remove(id: number) {
     // Find related categories
-    const relatedCategories = await this.postsRepository.findOne(id, {
-      relations: ['categories'],
-    });
-
-    // Map related categories into array of ids
-    const categoryArray = relatedCategories['categories'].map(
-      (category) => category.id,
-    );
+    const relatedCategories = await this.postsRepository.findOne(id);
 
     // Delete posts
     const deleteResponse = await this.postsRepository
@@ -98,6 +91,8 @@ export class PostsService {
 
     // Update data in categories based on array of ids
     // This is used to track number of items in category
-    await this.categoryService.updateCategories(categoryArray);
+    await this.categoryService.updateCategoryData(
+      relatedCategories?.categories,
+    );
   }
 }

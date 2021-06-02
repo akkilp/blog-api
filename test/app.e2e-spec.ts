@@ -193,64 +193,94 @@ describe('E2E tests for the application', () => {
         'Authentication=; HttpOnly; Path=/; Max-Age=0',
       );
     });
+  });
 
-    describe('Functionality for authenticated users', () => {
-      it('/posts (POST) User is able to create posts', async () => {
-        const response = await request(app.getHttpServer())
-          .post('/posts')
-          .set('Cookie', cookie)
-          .send(mockData.createPostData)
-          .expect(201);
+  describe('Functionality for authenticated users', () => {
+    it('/posts (POST) User is able to create posts', async () => {
+      const response = await request(app.getHttpServer())
+        .post('/posts')
+        .set('Cookie', cookie)
+        .send(mockData.createPostData)
+        .expect(201);
 
-        expect(response.body.content).toBe(mockData.createPostData.content);
-        expect(response.body.title).toBe(mockData.createPostData.title);
-        expect(response.body.author.email).toBe(mockData.registerData.email);
-        expect(response.body.author.name).toBe(mockData.registerData.name);
-        expect(response.body.categories.length).toBe(
-          mockData.createPostData.categories.length,
-        );
-      });
+      expect(response.body.content).toBe(mockData.createPostData.content);
+      expect(response.body.title).toBe(mockData.createPostData.title);
+      expect(response.body.author.email).toBe(mockData.registerData.email);
+      expect(response.body.author.name).toBe(mockData.registerData.name);
+      expect(response.body.categories.length).toBe(
+        mockData.createPostData.categories.length,
+      );
+    });
 
-      it('/post/:id (GET) Created post data is correct', async () => {
-        const validCategories = [
-          { id: 1, name: 'category1', numberOfPosts: 1 },
-          { id: 2, name: 'category2', numberOfPosts: 1 },
-          { id: 3, name: 'category3', numberOfPosts: 1 },
-        ];
+    it('/post/:id (GET) Created post data is correct', async () => {
+      const validCategories = [
+        { id: 1, name: 'category1', numberOfPosts: 1 },
+        { id: 2, name: 'category2', numberOfPosts: 1 },
+        { id: 3, name: 'category3', numberOfPosts: 1 },
+      ];
 
-        const response = await request(app.getHttpServer())
-          .get('/posts/1')
-          .expect(200);
-        expect(response.body.content).toBe(mockData.createPostData.content);
-        expect(response.body.title).toBe(mockData.createPostData.title);
-        expect(response.body.author.email).toBe(mockData.registerData.email);
-        expect(response.body.author.name).toBe(mockData.registerData.name);
-        expect(response.body.categories.length).toBe(
-          mockData.createPostData.categories.length,
-        );
-        expect(response.body.categories).toEqual(validCategories);
-      });
+      const response = await request(app.getHttpServer())
+        .get('/posts/1')
+        .expect(200);
+      expect(response.body.content).toBe(mockData.createPostData.content);
+      expect(response.body.title).toBe(mockData.createPostData.title);
+      expect(response.body.author.email).toBe(mockData.registerData.email);
+      expect(response.body.author.name).toBe(mockData.registerData.name);
+      expect(response.body.categories.length).toBe(
+        mockData.createPostData.categories.length,
+      );
+      expect(response.body.categories).toEqual(validCategories);
+    });
 
-      it('/posts/:id (PATCH) User is able to update posts', async () => {
-        const response = await request(app.getHttpServer())
-          .patch('/posts/1')
-          .set('Cookie', cookie)
-          .send(mockData.updatedPostData)
-          .expect(200);
+    it('/posts/:id (PATCH) User is able to update posts', async () => {
+      await request(app.getHttpServer())
+        .patch('/posts/1')
+        .set('Cookie', cookie)
+        .send(mockData.updatedPostData)
+        .expect(200);
 
-        expect(response.body.content).toBe(mockData.createPostData.content);
-        expect(response.body.title).toBe(mockData.updatedPostData.title);
-        expect(response.body.author.email).toBe(mockData.registerData.email);
-        expect(response.body.author.name).toBe(mockData.registerData.name);
-        const findNewCategory = response.body.categories.filter(
-          (category) => category.name === 'newCategory',
-        );
-        expect(findNewCategory.length).toBeGreaterThan(0);
-        const findOldCategory = response.body.categories.filter(
-          (category) => category.name === 'category2',
-        );
-        expect(findOldCategory.length).not.toBeGreaterThan(0);
-      });
+      const response = await request(app.getHttpServer())
+        .get('/posts/1')
+        .expect(200);
+
+      expect(response.body.content).toBe(mockData.createPostData.content);
+      expect(response.body.title).toBe(mockData.updatedPostData.title);
+      expect(response.body.author.email).toBe(mockData.registerData.email);
+      expect(response.body.author.name).toBe(mockData.registerData.name);
+      const findNewCategory = response.body.categories.filter(
+        (category) => category.name === 'newCategory',
+      );
+      expect(findNewCategory.length).toBeGreaterThan(0);
+      const findOldCategory = response.body.categories.filter(
+        (category) => category.name === 'category2',
+      );
+      expect(findOldCategory.length).not.toBeGreaterThan(0);
+    });
+
+    it('/categories/:id (DELETE) User is able to delete categories', async () => {
+      await request(app.getHttpServer())
+        .delete('/categories/1')
+        .set('Cookie', cookie)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get('/categories/1')
+        .expect(404);
+
+      expect(response.body.message).toBe('Category does not exist');
+    });
+
+    it('/posts/:id (DELETE) User is able to delete posts', async () => {
+      await request(app.getHttpServer())
+        .delete('/posts/1')
+        .set('Cookie', cookie)
+        .expect(200);
+
+      const response = await request(app.getHttpServer())
+        .get('/posts/1')
+        .expect(404);
+
+      expect(response.body.message).toBe('Post not found');
     });
   });
 

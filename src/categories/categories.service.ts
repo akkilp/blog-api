@@ -15,17 +15,15 @@ export class CategoryService {
     return this.categoryRepository.find({ relations: ['posts'] });
   }
 
-  /* Create category or increase number of existing one */
+  /* Create categories if not existing*/
   async createCategories(categories: CategoryDto[]) {
     const response = await this.categoryRepository
       .createQueryBuilder()
       .insert()
       .into(Category)
       .values(categories)
-      .onConflict(
-        `("name") DO UPDATE SET "numberOfPosts" = category."numberOfPosts" + 1`,
-      )
-      .returning('id')
+      .onConflict(`("name") DO UPDATE SET name=EXCLUDED."name"`)
+      .returning(['id', 'name'])
       .execute();
 
     /* Returns response in a form of:
@@ -62,19 +60,27 @@ export class CategoryService {
     if (!deleteResponse.affected) {
       throw new HttpException('Category does not exist', HttpStatus.NOT_FOUND);
     }
+    this.updateCategoryData([{ id }]);
   }
 
-  async updateCategoryData(category) {
-    const categoryData = await this.getCategoryById(category);
-    const hitAmount = categoryData['posts'] ? categoryData['posts'].length : 0;
-    categoryData.numberOfPosts = hitAmount;
-    await this.categoryRepository.save(categoryData);
-  }
+  /* Update amount of blogposts in category  */
+  async updateCategoryData(categoryArr: any) {
+    const categories = await this.getAllCategories();
+    const idArr = categoryArr.map((category) => category.id);
 
-  async updateCategories(categories: any) {
+    const updatedData = categories.reduce((array, current) => {
+      return array.concat({ id: current.id, amount: current.posts.length });
+    }, []);
+
+    const targets = updatedData.filter((item) => idArr.includes(item.id));
+
     await Promise.all(
-      categories.map(
-        async (categories) => await this.updateCategoryData(categories),
+      targets.map(
+        async (target) =>
+          await this.categoryRepository.save({
+            id: target.id,
+            numberOfPosts: target.amount,
+          }),
       ),
     );
   }
