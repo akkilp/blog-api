@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { PostsModule } from './posts/posts.module';
 import { ConfigModule } from '@nestjs/config';
 import { validateEnvVariables } from './util/envValidationSchema';
@@ -6,6 +6,7 @@ import { DatabaseModule } from './database/database.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { CategoryModule } from './categories/categories.module';
 import { UsersModule } from './users/users.module';
+import { HttpLoggerMiddleware } from '@nest-toolbox/http-logger-middleware';
 
 @Module({
   imports: [
@@ -21,4 +22,11 @@ import { UsersModule } from './users/users.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(HttpLoggerMiddleware).forRoutes({
+      path: '*',
+      method: RequestMethod.ALL,
+    });
+  }
+}

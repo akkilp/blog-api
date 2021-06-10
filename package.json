@@ -18,10 +18,10 @@
     "start:db:dev": "docker-compose down && docker-compose up --build",
     "start:db:test": "docker-compose down && docker-compose -f docker-compose-test.yml up",
     "test:e2e": "jest --config ./test/jest-e2e.json"
-
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",
+    "@nest-toolbox/http-logger-middleware": "^1.4.3",
     "@nestjs/common": "^7.6.15",
     "@nestjs/config": "^0.6.3",
     "@nestjs/core": "^7.6.15",
