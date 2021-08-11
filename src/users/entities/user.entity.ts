@@ -1,4 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Exclude } from 'class-transformer';
+import { Post } from '../../posts/entities/post.entity';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
 class User {
@@ -12,7 +14,11 @@ class User {
   public name: string;
 
   @Column()
+  @Exclude({ toPlainOnly: true })
   public password: string;
+
+  @OneToMany(() => Post, (post: Post) => post.author)
+  public posts: Post[];
 
   /*   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)' })
   createdDate: Date;

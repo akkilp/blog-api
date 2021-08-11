@@ -11,6 +11,10 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
+  async getAllUsers() {
+    return await this.usersRepository.find();
+  }
+
   async create(userData: CreateUserDto) {
     const newUser = await this.usersRepository.create(userData);
     await this.usersRepository.save(newUser);
@@ -27,6 +31,7 @@ export class UsersService {
       HttpStatus.NOT_FOUND,
     );
   }
+
   async getById(id: number) {
     const user = await this.usersRepository.findOne(id);
     if (user) {

@@ -1,0 +1,13 @@
+version: "3"
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    logging:
+        driver: none
+    ports:
+    - "5432:5432"
+    env_file:
+    - docker.env
+
+ 

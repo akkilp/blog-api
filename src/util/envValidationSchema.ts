@@ -10,5 +10,6 @@ export const validateEnvVariables = {
     PORT: Joi.number(),
     JWT_SECRET: Joi.string().required(),
     JWT_EXPIRATION_TIME: Joi.string().required(),
+    ADMIN_PASSWORD: Joi.string().required(),
   }),
 };
