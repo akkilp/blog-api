@@ -50,7 +50,6 @@ export class AuthenticationController {
     return response.send(user);
   }
 
-  @UseGuards(JwtAuthenticationGuard)
   @Post('logout')
   async logOut(@Req() request: RequestWithUser, @Res() response: Response) {
     response.setHeader(
