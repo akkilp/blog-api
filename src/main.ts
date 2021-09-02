@@ -7,7 +7,13 @@ async function bootstrap() {
     logger: true,
   });
   app.use(cookieParser());
-  app.enableCors({ origin: 'http://localhost:8080', credentials: true });
-  await app.listen(3050);
+  app.enableCors({
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? process.env.PROD_CLIENT
+        : 'http://localhost:8080',
+    credentials: true,
+  });
+  await app.listen(process.env.PORT as string | 3050);
 }
 bootstrap();
