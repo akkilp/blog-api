@@ -7,7 +7,6 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import { CategoryModule } from './categories/categories.module';
 import { UsersModule } from './users/users.module';
 import { HttpLoggerMiddleware } from '@nest-toolbox/http-logger-middleware';
-import { MailModule } from './mail/mail.module';
 
 @Module({
   imports: [
@@ -19,7 +18,6 @@ import { MailModule } from './mail/mail.module';
     PostsModule,
     AuthenticationModule,
     UsersModule,
-    MailModule,
   ],
   controllers: [],
   providers: [],
