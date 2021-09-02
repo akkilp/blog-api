@@ -10,7 +10,7 @@ async function bootstrap() {
   });
   app.use(cookieParser());
   app.enableCors({
-    origin: true,
+    origin: 'https://blog-client-dhrmgbd7w-akkilp.vercel.app/',
     credentials: true,
   });
   await app.listen(process.env.PORT || 3050);
