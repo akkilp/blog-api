@@ -10,7 +10,7 @@ async function bootstrap() {
   });
   app.use(cookieParser());
   app.enableCors({
-    origin: 'https://blog-client-nine.vercel.app',
+    origin: 'https://aleksikilponen.vercel.app',
     credentials: true,
     exposedHeaders: ['set-cookie'],
   });
