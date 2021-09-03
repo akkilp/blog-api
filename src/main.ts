@@ -12,6 +12,7 @@ async function bootstrap() {
   app.enableCors({
     origin: 'https://blog-client-nine.vercel.app',
     credentials: true,
+    exposedHeaders: ['set-cookie'],
   });
   await app.listen(process.env.PORT || 3050);
 }
