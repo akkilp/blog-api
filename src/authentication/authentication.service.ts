@@ -96,10 +96,10 @@ export class AuthenticationService {
     const token = this.jwtService.sign(payload);
     return `Authentication=${token}; Path=/; Max-Age=${this.configService.get(
       'JWT_EXPIRATION_TIME',
-    )}; SameSite=None; Secure; HttpOnly;`;
+    )}; SameSite=None; Secure; HttpOnly`;
   }
 
   public getCookieForLogOut() {
-    return `Authentication=; HttpOnly; Path=/; Max-Age=0; Secure`;
+    return `Authentication=; Path=/; Max-Age=0; SameSite=None; Secure; HttpOnly`;
   }
 }
