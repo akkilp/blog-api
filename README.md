@@ -16,3 +16,4 @@ To run local:
 
 Ps. Use ADMIN_PASSWORD in env to register yourself account and test the crud operations
 
+client: https://github.com/akkilp/blog-client
